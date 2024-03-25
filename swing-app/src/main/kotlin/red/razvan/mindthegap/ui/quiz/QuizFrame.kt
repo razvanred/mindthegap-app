@@ -10,7 +10,9 @@ import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Font
 import java.awt.GridLayout
+import javax.imageio.ImageIO
 import javax.swing.*
+import javax.swing.border.EmptyBorder
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
@@ -30,6 +32,8 @@ interface QuizFrame {
     fun refreshMissingLabel(state: MissingLabelState)
 
     fun refreshValidateButton(state: ValidateButtonState)
+
+    fun refreshBackButton(state: BackButtonState)
 }
 
 fun QuizFrame.Companion.withFileIds(
@@ -79,11 +83,12 @@ private class DefaultQuizFrame(
     }
 
     fun createWordTextField(): JTextField =
-        JTextField(20)
+        JTextField(20).apply {
+            horizontalAlignment = SwingConstants.CENTER
+        }
 
     private val questionTextField = createWordTextField().apply {
         isEditable = false
-        background = Color.WHITE
         isFocusable = false
     }
     private val answerTextField = createWordTextField().apply {
@@ -111,6 +116,27 @@ private class DefaultQuizFrame(
         }
     }
 
+    private val skipButton = JButton("Salta").apply {
+        addActionListener { _ ->
+            val result = JOptionPane.showConfirmDialog(
+                this,
+                "Il quesito saltato verrà conteggiato tra gli errori",
+                "Salta quesito",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE
+            )
+            if (result == JOptionPane.OK_OPTION) {
+                controller.skip()
+            }
+        }
+    }
+
+    private val backButton = JButton("Indietro").apply {
+        addActionListener { _ ->
+            controller.back()
+        }
+    }
+
     private val controller = QuizFrameController(
         frame = this,
         assignments = assignments,
@@ -120,60 +146,65 @@ private class DefaultQuizFrame(
         fun createTextFieldPanel(imageIcon: ImageIcon, textField: JTextField) =
             JPanel().apply {
                 layout = BorderLayout()
-                add(JLabel(imageIcon, JLabel.CENTER), "North")
+                add(JLabel(imageIcon, JLabel.CENTER).apply {
+                    border = EmptyBorder(0, 0, 10, 0)
+                }, "North")
                 add(textField, "Center")
             }
 
-
-        val skipButton = JButton("Salta").apply {
-            isEnabled = false
-            addActionListener { _ ->
-                controller.skip()
-            }
-        }
-
         val questionPanel = createTextFieldPanel(
-            imageIcon = ImageIcon("/en.png"),
+            imageIcon = ImageIcon(ImageIO.read(this::class.java.getResourceAsStream("/it.png"))),
             textField = questionTextField
-        )
+        ).apply {
+            border = EmptyBorder(5, 0, 10, 5)
+        }
 
         val answerPanel = createTextFieldPanel(
-            imageIcon = ImageIcon("/it.png"),
+            imageIcon = ImageIcon(ImageIO.read(this::class.java.getResourceAsStream("/uk.png"))),
             textField = answerTextField
-        )
-
-        val panel2 = JPanel().apply {
-            layout = BorderLayout()
-            add(questionPanel, "West")
-            add(answerPanel, "Center")
+        ).apply {
+            border = EmptyBorder(5, 5, 10, 0)
         }
 
-        val panel3 = JPanel().apply {
+        val assignmentPanel = JPanel().apply {
+            layout = BorderLayout()
+            add(questionPanel, "West")
+            add(answerPanel, "East")
+        }
+
+        val controlButtonsPanel = JPanel().apply {
             layout = BorderLayout()
             add(validateButton, "Center")
-            add(skipButton, "West")
+            add(JPanel().apply {
+                layout = GridLayout(2, 1)
+                add(skipButton)
+                add(backButton)
+            }, "West")
             add(nextButton, "East")
+            border = EmptyBorder(5, 0, 5, 0)
         }
 
         val panel4 = JPanel().apply {
             layout = GridLayout(2, 1)
-            add(panel2)
-            add(panel3)
+            add(assignmentPanel)
+            add(controlButtonsPanel)
         }
 
-        val panelS0 = JPanel().apply {
+        val labelsPanel = JPanel().apply {
             layout = BorderLayout()
             add(errorsLabel, "West")
             add(missingLabel, "East")
+            border = EmptyBorder(5, 0, 0, 0)
         }
 
-        val panelS1 = JPanel().apply {
+        val contentPanel = JPanel().apply {
             layout = BorderLayout()
             add(panel4, "Center")
-            add(panelS0, "South")
+            add(labelsPanel, "South")
+            border = EmptyBorder(10, 10, 10, 10)
         }
 
-        contentPane.add(panelS1)
+        contentPane.add(contentPanel)
         iconImage = AppIcon
 
         jMenuBar = JBar(1, this)
@@ -185,10 +216,10 @@ private class DefaultQuizFrame(
     }
 
     override fun refreshNextButton(state: NextButtonState) {
-        with (nextButton) {
+        with(nextButton) {
             text = when (state.label) {
                 NextButtonState.Label.Finish -> "Fine"
-                NextButtonState.Label.Next -> "Prossimo"
+                NextButtonState.Label.Next -> "Avanti"
             }
             isEnabled = state.isEnabled
         }
@@ -204,29 +235,51 @@ private class DefaultQuizFrame(
     }
 
     override fun refreshErrorsLabel(state: ErrorsLabelState) {
-        val count = state.errors
-        errorsLabel.text = if (count == 1U) {
-            "Un errore"
-        } else {
-            "$count errori"
+        val (errors, skipped) = state
+        val errorsText = when (errors) {
+            0U -> "Nessun errore"
+            1U -> "Un errore"
+            else -> "$errors errori"
         }
+        val skippedText = if (skipped == 1U) {
+            "uno saltato"
+        } else {
+            "$skipped saltati"
+        }
+        errorsLabel.text = errorsText + if (skipped > 0U) " (di cui $skippedText)" else ""
     }
 
     override fun refreshAnswerFieldState(state: AnswerFieldState) {
-        with (answerTextField) {
+        with(answerTextField) {
             when (state) {
-                is AnswerFieldState.Answered -> {
-                    background = when (state.isCorrect) {
-                        true -> Color.GREEN
-                        false -> Color.RED
+                is AnswerFieldState.Answered, AnswerFieldState.Skipped -> {
+                    skipButton.isEnabled = false
+                    background = if (state is AnswerFieldState.Answered) {
+                        when (state.isCorrect) {
+                            true -> Color.GREEN
+                            false -> Color.RED
+                        }
+                    } else {
+                        Color.ORANGE
+                    }
+                    text = if (state is AnswerFieldState.Answered) {
+                        state.userAnswer
+                    } else {
+                        "<Saltata>"
                     }
                     isEditable = false
+                    isFocusable = false
+                    rootPane.defaultButton = nextButton
                 }
+
                 AnswerFieldState.WaitForAnswer -> {
-                    background = Color.WHITE
+                    skipButton.isEnabled = true
+                    isFocusable = true
+                    background = UIManager.getColor("TextField.inactiveBackground")
                     text = ""
                     isEditable = true
                     requestFocus()
+                    rootPane.defaultButton = validateButton
                 }
             }
         }
@@ -238,6 +291,10 @@ private class DefaultQuizFrame(
 
     override fun refreshValidateButton(state: ValidateButtonState) {
         validateButton.isEnabled = state.isEnabled
+    }
+
+    override fun refreshBackButton(state: BackButtonState) {
+        backButton.isEnabled = state.isEnabled
     }
 
     companion object

@@ -2,6 +2,7 @@ package red.razvan.mindthegap.ui
 
 import red.razvan.mindthegap.Constants
 import red.razvan.mindthegap.ui.home.HomeFrame
+import red.razvan.mindthegap.ui.home.create
 import java.awt.*
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
@@ -59,9 +60,11 @@ class JBar(position: Int, frm: JFrame) : JMenuBar(), ActionListener {
             )
 
             if (n == JOptionPane.YES_OPTION) {
-                val wP = HomeFrame()
-                wP.isVisible = true
-                frm.isVisible = false
+                HomeFrame.create { isVisible = true }
+                with(frm) {
+                    isVisible = false
+                    dispose()
+                }
             }
         }
 

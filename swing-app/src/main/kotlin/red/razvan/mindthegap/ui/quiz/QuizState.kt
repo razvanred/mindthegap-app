@@ -19,11 +19,10 @@ data class QuizState(
                 solution.equals(a.trim(), ignoreCase = true)
             }
 
-        assignmentState.evaluation = if (isCorrect) {
-            Evaluation.Correct
-        } else {
-            Evaluation.Wrong(userAnswer = a)
-        }
+        assignmentState.evaluation = Evaluation.Answered(
+            isCorrect = isCorrect,
+            userAnswer = a,
+        )
     }
 
     fun skip(at: UInt) {
@@ -46,8 +45,15 @@ val QuizState.errorsCount: UInt
         .count { assignment ->
             assignment.evaluation
                 .let { evaluation ->
-                    evaluation != null && evaluation != Evaluation.Correct
+                    evaluation != null && (evaluation as? Evaluation.Answered)?.isCorrect != true
                 }
+        }
+        .toUInt()
+
+val QuizState.skippedCount: UInt
+    get() = assignmentStates
+        .count { assignment ->
+            assignment.evaluation == Evaluation.Skipped
         }
         .toUInt()
 
@@ -62,11 +68,10 @@ data class AssignmentState(
 )
 
 sealed interface Evaluation {
-    data object Correct : Evaluation
-
     data object Skipped : Evaluation
 
-    data class Wrong(
-        val userAnswer: String
+    data class Answered(
+        val userAnswer: String,
+        val isCorrect: Boolean
     ) : Evaluation
 }

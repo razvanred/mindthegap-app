@@ -1,7 +1,8 @@
 package red.razvan.mindthegap
 
 import red.razvan.mindthegap.ui.home.HomeFrame
+import red.razvan.mindthegap.ui.home.create
 
 fun main() {
-    HomeFrame().isVisible = true
+    HomeFrame.create { isVisible = true }
 }
