@@ -1,0 +1,171 @@
+[
+  {
+    "id": "file_1",
+    "name": "File 1",
+    "description": "Description Test - File 1",
+    "assignments": [
+      {
+        "id": "first_name",
+        "en": {
+          "values": ["first name"]
+        },
+        "it": {
+          "values": ["nome"]
+        }
+      },
+      {
+        "id": "surname",
+        "en": {
+          "values": ["surname"]
+        },
+        "it": {
+          "values": ["cognome"]
+        }
+      },
+      {
+        "id": "age",
+        "en": {
+          "values": ["age"]
+        },
+        "it": {
+          "values": ["età"]
+        }
+      },
+      {
+        "id": "date_of_birth",
+        "en": {
+          "values": ["date of birth"]
+        },
+        "it": {
+          "values": ["data di nascita"]
+        }
+      },
+      {
+        "id": "job",
+        "en": {
+          "values": ["job"]
+        },
+        "it": {
+          "values": ["occupazione"]
+        }
+      },
+      {
+        "id": "nationality",
+        "en": {
+          "values": ["nationality"]
+        },
+        "it": {
+          "values": ["nazionalità"]
+        }
+      },
+      {
+        "id": "town",
+        "en": {
+          "values": ["town"]
+        },
+        "it": {
+          "values": ["città"]
+        }
+      },
+      {
+        "id": "residence",
+        "en": {
+          "values": ["residence"]
+        },
+        "it": {
+          "values": ["residenza"]
+        }
+      },
+      {
+        "id": "address",
+        "en": {
+          "values": ["address"]
+        },
+        "it": {
+          "values": ["indirizzo"]
+        }
+      },
+      {
+        "id": "phone_number",
+        "en": {
+          "values": ["telephone number", "phone number"]
+        },
+        "it": {
+          "values": ["numero di telefono"]
+        }
+      },
+      {
+        "id": "email_address",
+        "en": {
+          "values": ["e-mail address"]
+        },
+        "it": {
+          "values": ["indirizzo di posta elettronica"]
+        }
+      },
+      {
+        "id": "married",
+        "en": {
+          "values": ["married"]
+        },
+        "it": {
+          "values": ["sposato"]
+        }
+      },
+      {
+        "id": "single",
+        "en": {
+          "values": ["single"]
+        },
+        "it": {
+          "values": ["celibe", "nubile"]
+        }
+      },
+      {
+        "id": "divorced",
+        "en": {
+          "values": ["divorced"]
+        },
+        "it": {
+          "values": ["divorziato"]
+        }
+      },
+      {
+        "id": "separated",
+        "en": {
+          "values": ["separated"]
+        },
+        "it": {
+          "values": ["separato"]
+        }
+      },
+      {
+        "id": "baby",
+        "en": {
+          "values": ["baby"]
+        },
+        "it": {
+          "values": ["neonato", "neonata"]
+        }
+      },
+      {
+        "id": "child_boy",
+        "en": {
+          "values": ["baby boy"]
+        },
+        "it": {
+          "values": ["bambino maschio", "bambino"]
+        }
+      },
+      {
+        "id": "young_boy",
+        "en": {
+          "values": ["young boy"]
+        },
+        "it": {
+          "values": ["ragazzo maschio", "ragazzo"]
+        }
+      }
+    ]
+  }
+]
