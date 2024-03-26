@@ -88,7 +88,7 @@ private class DefaultHomeFrame : JFrame("Scegli file - " + Constants.APP_NAME), 
 
     override fun navigateToQuizFrame(fileIds: List<File.Id>, shuffled: Boolean) {
         QuizFrame
-            .withFileIds(fileIds = fileIds, shuffled = shuffled) {
+            .withFileIds(fileIds = fileIds, shuffle = shuffled) {
                 isVisible = true
             }
         isVisible = false

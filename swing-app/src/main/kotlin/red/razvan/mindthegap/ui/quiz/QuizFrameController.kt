@@ -44,7 +44,11 @@ class QuizFrameController(
 
     fun next() {
         at++
-        refreshNavigator()
+        if (at == state.assignmentStates.size.toUInt()) {
+            frame.navigateToResultFrame(state = state)
+        } else {
+            refreshNavigator()
+        }
     }
 
     fun back() {

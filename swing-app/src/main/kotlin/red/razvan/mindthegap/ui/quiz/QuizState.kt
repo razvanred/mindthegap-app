@@ -62,6 +62,13 @@ val QuizState.missingCount: UInt
         .count { it.evaluation == null }
         .toUInt()
 
+val QuizState.correctCount: UInt
+    get() = assignmentStates
+        .count {
+            (it.evaluation as? Evaluation.Answered)?.isCorrect == true
+        }
+        .toUInt()
+
 data class AssignmentState(
     val assignment: Assignment,
     var evaluation: Evaluation? = null,

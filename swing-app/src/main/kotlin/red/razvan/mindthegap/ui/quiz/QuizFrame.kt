@@ -6,6 +6,8 @@ import red.razvan.mindthegap.model.Assignment
 import red.razvan.mindthegap.model.File
 import red.razvan.mindthegap.ui.AppIcon
 import red.razvan.mindthegap.ui.JBar
+import red.razvan.mindthegap.ui.result.ResultFrame
+import red.razvan.mindthegap.ui.result.withQuizState
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Font
@@ -34,11 +36,13 @@ interface QuizFrame {
     fun refreshValidateButton(state: ValidateButtonState)
 
     fun refreshBackButton(state: BackButtonState)
+
+    fun navigateToResultFrame(state: QuizState)
 }
 
 fun QuizFrame.Companion.withFileIds(
     fileIds: List<File.Id>,
-    shuffled: Boolean = false,
+    shuffle: Boolean = false,
     builder: JFrame.() -> Unit = {},
 ): QuizFrame =
     DefaultQuizFrame(
@@ -51,7 +55,28 @@ fun QuizFrame.Companion.withFileIds(
             }
             .flatten()
             .let { assignments ->
-                if (shuffled) {
+                if (shuffle) {
+                    assignments.shuffled()
+                } else {
+                    assignments
+                }
+            }
+    )
+        .also(builder)
+
+fun QuizFrame.Companion.withPreviousState(
+    state: QuizState,
+    shuffle: Boolean = false,
+    builder: JFrame.() -> Unit = {},
+) : QuizFrame =
+    DefaultQuizFrame(
+        assignments = state
+            .assignmentStates
+            .map { assignmentState ->
+                assignmentState.assignment
+            }
+            .let { assignments ->
+                if (shuffle) {
                     assignments.shuffled()
                 } else {
                     assignments
@@ -295,6 +320,12 @@ private class DefaultQuizFrame(
 
     override fun refreshBackButton(state: BackButtonState) {
         backButton.isEnabled = state.isEnabled
+    }
+
+    override fun navigateToResultFrame(state: QuizState) {
+        ResultFrame.withQuizState(state = state) { isVisible = true }
+        isVisible = false
+        dispose()
     }
 
     companion object
